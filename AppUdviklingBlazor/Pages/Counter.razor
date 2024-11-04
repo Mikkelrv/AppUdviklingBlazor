@@ -1,0 +1,51 @@
+﻿@page "/counter"
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @_currentCount</p>
+<p role="status" style="color:@_color">RandomNum: @_randomNum</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="ResetRandomNum">Reset Random Number</button>
+<button class="btn btn-primary" @onclick="ResetCount">Reset Count</button>
+
+@code {
+	private Random _r = new Random();
+	private int _currentCount = 0;
+	private int _randomNum=0;
+	private string _color = "black";
+	const string currentCountKey = "currentCount";
+	const string randomNumKey = "randomNum";
+
+	protected override async Task OnInitializedAsync()
+	{
+		_currentCount = await localStore.GetItemAsync<int?>(currentCountKey) ?? 0;
+		_randomNum = await localStore.GetItemAsync<int?>(randomNumKey) ?? 0;
+
+	} 
+
+	private async void  IncrementCount()
+	{
+		_currentCount++;
+		_randomNum = _r.Next(_currentCount);
+		_color = _randomNum == 24? "tomato" : "black";
+		await localStore.SetItemAsync(currentCountKey, _currentCount);
+		await localStore.SetItemAsync(randomNumKey, _randomNum);
+	}
+	private async void ResetCount()
+	{
+		_currentCount = 0;
+		await localStore.RemoveItemAsync(currentCountKey);
+	}
+	private async void ResetRandomNum()
+	{
+		_randomNum = 0;
+		await localStore.RemoveItemAsync(randomNumKey);
+
+	}
+
+
+}

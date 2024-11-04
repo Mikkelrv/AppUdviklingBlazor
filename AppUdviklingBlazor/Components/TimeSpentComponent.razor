@@ -1,0 +1,27 @@
+﻿<h3>TimeSpentComponent</h3>
+
+
+<div class="timeSpent" style="color:hotpink; z-index: -1; font-size:@(_counter)px; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%)">
+	<p>@TimeSpent.ToString("HH:mm:ss")</p>
+</div>
+
+@code {
+	public TimeOnly TimeSpent = new TimeOnly(0, 0, 0);
+	public int _counter = 0;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await TimeTicker();
+	}
+
+	private async Task TimeTicker()
+	{
+		PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+		while (await timer.WaitForNextTickAsync())
+		{
+			_counter++;
+			TimeSpent = TimeSpent.Add(TimeSpan.FromSeconds(1));
+			StateHasChanged();
+		}
+	}
+}

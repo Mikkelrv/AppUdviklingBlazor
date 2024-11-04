@@ -1,0 +1,49 @@
+﻿@page "/jokes"
+@inject HttpClient Http
+
+<div class="container mt-5">
+    <h3 class="text-center">Jokes</h3>
+    @if (CurrentJoke is not null)
+    {
+        <div class="text-center my-4">
+            <p class="lead">@CurrentJoke.Setup</p>
+            @if (ShowPunchline)
+            {
+                <p class="text-muted">@CurrentJoke.Punchline</p>
+            }
+            @if (!ShowPunchline)
+            {
+                <button class="btn btn-primary" @onclick="SetShowPunchLine">Show Punchline</button>
+            }
+            else
+            {
+                <button class="btn btn-secondary" @onclick="NewJoke">New Joke</button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    public Joke CurrentJoke { get; set; }
+    public bool ShowPunchline = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchJoke();
+    }
+
+    private void SetShowPunchLine()
+    {
+        ShowPunchline = !ShowPunchline;
+    }
+    private async Task NewJoke()
+    {
+        SetShowPunchLine();
+        await FetchJoke();
+    }
+
+    private async Task FetchJoke()
+    {
+        CurrentJoke = await Http.GetFromJsonAsync<Joke>("https://official-joke-api.appspot.com/random_joke");
+    }
+}

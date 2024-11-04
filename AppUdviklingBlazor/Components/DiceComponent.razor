@@ -1,0 +1,58 @@
+﻿@using AppUdviklingBlazor.Model
+<div >
+	<button class="btn btn-primary" @onclick="@(()=> RollDices(Dices))">Roll</button>
+	<main>
+		@foreach (var dice in Dices)
+		{
+			<span class="display-1">
+				@GetDiceEntityCode(dice.Eyes)
+			</span>
+		}
+	</main>
+</div>
+
+@code {
+	[Parameter]
+	public int AmountOfDices { get; set; } = 1;
+	public List<Dice> Dices;
+
+	private void AddDice() => Dices.Add(new Dice());
+
+	protected override void OnInitialized()
+	{
+		Dices = new List<Dice>();
+		for (int i = 0; i < AmountOfDices; i++){AddDice();}
+	}
+
+	private void RollDices(List<Dice> dices)
+	{
+		foreach (var dice in dices){dice.Roll();}
+	}
+
+	private MarkupString GetDiceEntityCode(int number)
+	{
+		switch (number)
+		{
+			case 1:
+				return (MarkupString)"&#9856;";
+			case 2:
+				return (MarkupString)"&#9857;";
+			case 3:
+				return (MarkupString)"&#9858;";
+			case 4:
+				return (MarkupString)"&#9859;";
+			case 5:
+				return (MarkupString)"&#9860;";
+			case 6:
+				return (MarkupString)"&#9861;";
+			default:
+				return (MarkupString)"";
+		}
+	}
+
+
+}
+
+
+
+

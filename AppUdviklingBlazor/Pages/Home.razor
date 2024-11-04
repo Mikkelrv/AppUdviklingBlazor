@@ -1,0 +1,33 @@
+﻿@page "/"
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+
+<PageTitle>Home</PageTitle>
+
+<TimeSpentComponent/>
+<br/>
+
+<button @onclick="UpdateLocalStorage">Save</button>
+<button @onclick="ClearLocalStorage">clear</button>
+
+<DiceComponent AmountOfDices="7"/>
+
+@code{
+	const string noteKey = "Note";
+	string noteContent;
+
+	protected override async Task OnInitializedAsync()
+	{
+		noteContent = await localStore.GetItemAsync<string>(noteKey); 
+	}
+
+	public async void UpdateLocalStorage()
+	{
+		await localStore.SetItemAsync(noteKey, noteContent);
+	}
+	public async void ClearLocalStorage()
+	{
+		noteContent = "";
+		localStore.ClearAsync();
+	}
+
+}

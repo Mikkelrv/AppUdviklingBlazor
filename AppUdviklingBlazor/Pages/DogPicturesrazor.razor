@@ -1,0 +1,54 @@
+﻿@page "/dogs"
+@using System.Text.Json;
+@inject HttpClient http
+
+@* Dog Pictures Component *@
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Dog Pictures</h3>
+
+    <div class="text-center mb-4">
+        <button class="btn btn-primary" @onclick="NewPictures">New Pictures</button>
+    </div>
+    <div class="row">
+        @foreach (var picture in _pictureList)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="picture-container" style="position: relative; width: 100%; padding-top: 100%;">
+                    <img src="@picture.Message" alt="Dog Picture" class="img-fluid rounded"
+                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border: 2px solid black;">
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+@code {
+    private List<DogPicture> _pictureList = new List<DogPicture>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pictureList = await fetchDogPictures()?? new List<DogPicture>();
+    }
+
+    private async Task<List<DogPicture>> fetchDogPictures()
+    {
+        _pictureList.Clear();
+        List<DogPicture> list = new List<DogPicture>();
+
+        for (int i = 0; i < 9; i++)
+        {
+            var Response = await http.GetFromJsonAsync<DogPicture>("https://dog.ceo/api/breeds/image/random");
+            list.Add(Response);
+        }
+        return list;
+    }
+
+    private async Task NewPictures()
+	{
+		_pictureList = await fetchDogPictures() ?? new List<DogPicture>();
+	}
+
+  
+
+}

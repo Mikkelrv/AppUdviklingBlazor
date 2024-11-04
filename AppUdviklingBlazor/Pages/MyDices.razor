@@ -1,0 +1,68 @@
+﻿@page "/mydices"
+@using AppUdviklingBlazor.Model
+
+
+<h3>Dices</h3>
+<button class="btn btn-primary" @onclick="AddDice" >Add dice</button>
+<button class="btn btn-primary" @onclick="RemoveDice" >Remove dice</button>
+<button class="btn btn-primary" @onclick="@(()=> RollDices(dices))">Roll</button>
+<main>
+	@foreach (var dice in dices)
+	{
+		<span class="display-1">
+			@GetDiceEntityCode(dice.Eyes)
+		</span>
+	}
+</main>
+
+
+@code {
+
+	private List<Dice> dices = new();
+	private int dice1 = 6;
+	private int dice2 = 6;
+
+	private void AddDice() => dices.Add(new Dice());
+	private void RemoveDice() => dices.RemoveAt(dices.Count - 1);
+
+	protected override void OnInitialized()
+	{
+		dices.Add(new Dice());
+		dices.Add(new Dice());
+	}
+
+
+	private void RollDices(List<Dice> dices)
+	{
+		foreach (var dice in dices)
+		{
+			dice.Roll();
+		}
+	}
+
+	private MarkupString GetDiceEntityCode(int number)
+	{
+		switch (number)
+		{
+			case 1:
+				return (MarkupString)"&#9856;";
+			case 2:
+				return (MarkupString)"&#9857;";
+			case 3:
+				return (MarkupString)"&#9858;";
+			case 4:
+				return (MarkupString)"&#9859;";
+			case 5:
+				return (MarkupString)"&#9860;";
+			case 6:
+				return (MarkupString)"&#9861;";
+			default:
+				return (MarkupString)"";
+		}
+	}
+
+
+}
+
+
+

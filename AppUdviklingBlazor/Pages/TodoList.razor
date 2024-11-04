@@ -1,0 +1,86 @@
+﻿@page "/todolist"
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+@using AppUdviklingBlazor.Model
+
+
+
+<div class=" container vh-100 d-flex justify-content-center align-items-center">
+	<div class="card col-md-6 col-lg-5 p-4">
+		<div class="todoContent card-body">
+			<h3 class="text-center">TodoList</h3>
+			<h4 class="text-center">@_items.Count((item) => item.isDone) of @_items.Count() are done</h4>
+
+			<div class="input-group mb-3">
+				<InputText class="form-control" @bind-Value="todoInput" placeholder="Write your new todo"></InputText>
+				<button class="btn btn-primary" @onclick="AddTodo">Add</button>
+				<button class="btn btn-secondary" @onclick="RemoveDoneToDos">Remove</button>
+			</div>
+
+			<table class="table table-striped rounded">
+				<tbody class="rounded">
+					@if (_items is not null && _items.Count() > 0)
+					{
+						@foreach (var item in _items)
+						{
+							<tr>
+								<td class="d-flex justify-content-start align-items-center">
+									<span class="me-auto">
+										<InputCheckbox @bind-Value="item.isDone"
+													   @onclick="() => OnChangeStateOfToDo(item)"></InputCheckbox>
+										@item.Title
+									</span>
+									<span class="trashbin align-self-end fs-4 " @onclick="@(()=> RemoveToDo(item))">&#128465;</span>
+								</td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+@code {
+    private List<ToDo> _items = new();
+    private string _itemsKey = "items";
+    string? todoInput;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _items = await localStore.GetItemAsync<List<ToDo>>(_itemsKey) ?? new List<ToDo>();
+        _items.Sort();
+        StateHasChanged();
+    }
+
+    private async Task AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(todoInput))
+        {
+            _items.Add(new ToDo { Title = todoInput });
+            await UpdateLocalStorage();
+            todoInput = "";
+        }
+    }
+
+    private async Task RemoveToDo(ToDo todo)
+    {
+        _items.Remove(todo);
+        await UpdateLocalStorage();
+    }
+
+    private async Task RemoveDoneToDos()
+    {
+        _items.RemoveAll((todo) => todo.isDone);
+        await UpdateLocalStorage();
+    }
+
+    private async void OnChangeStateOfToDo(ToDo t)
+    {
+        t.isDone = !t.isDone;
+        await UpdateLocalStorage();
+    }
+
+    private async Task UpdateLocalStorage() => await localStore.SetItemAsync<List<ToDo>>(_itemsKey, _items);
+
+
+}
